@@ -39,13 +39,20 @@ REDRECT    = pygame.Rect(XMARGIN, YMARGIN + BUTTONSIZE + BUTTONGAPSIZE, BUTTONSI
 GREENRECT  = pygame.Rect(XMARGIN + BUTTONSIZE + BUTTONGAPSIZE, YMARGIN + BUTTONSIZE + BUTTONGAPSIZE, BUTTONSIZE, BUTTONSIZE)
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, BEEP1, BEEP2, BEEP3, BEEP4
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT, BEEP1, BEEP2, BEEP3, BEEP4
 
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('Simulate')
+    display_surface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    text = font.render('Game Over', True, RED, BLUE)
+    textRect = text.get_rect()
+    textRect.center = (WINDOWWIDTH // 2, WINDOWHEIGHT // 2)
+
+    BIGFONT = pygame.font.Font('freesansbold.ttf', 60)
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     infoSurf = BASICFONT.render('Match the pattern by clicking on the button or using the Q, W, A, S keys.', 1, DARKGRAY)
     infoRect = infoSurf.get_rect()
@@ -219,6 +226,9 @@ def gameOverAnimation(color=WHITE, animationSpeed=50):
     BEEP3.play()
     BEEP4.play()
     r, g, b = color
+    displayGameOver()
+    pygame.display.update()
+    pygame.time.wait(1000)
     for i in range(3): # do the flash 3 times
         for start, end, step in ((0, 255, 1), (255, 0, -1)):
             # The first iteration in this loop sets the following for loop
@@ -233,7 +243,11 @@ def gameOverAnimation(color=WHITE, animationSpeed=50):
                 pygame.display.update()
                 FPSCLOCK.tick(FPS)
 
-
+def displayGameOver():
+    game_over = BIGFONT.render('GAME OVER',  1, BRIGHTRED)
+    game_over_rect = game_over.get_rect()
+    game_over_rect.center = (WINDOWWIDTH/2, WINDOWHEIGHT/2)
+    DISPLAYSURF.blit(game_over, game_over_rect)
 
 def getButtonClicked(x, y):
     if YELLOWRECT.collidepoint( (x, y) ):

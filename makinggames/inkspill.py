@@ -65,6 +65,7 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+    BASICFONT = pygame.font.Font('freesansbold.ttf', 12)
 
     # Load images
     LOGOIMAGE = pygame.image.load('inkspilllogo.png')
@@ -80,6 +81,8 @@ def main():
     life = maxLife
     lastPaletteClicked = None
 
+    moves = 0
+
     while True: # main game loop
         paletteClicked = None
         resetGame = False
@@ -90,6 +93,10 @@ def main():
         drawBoard(mainBoard)
         drawLifeMeter(life)
         drawPalettes()
+
+        moves_surf = BASICFONT.render("Moves: " + str(moves), True, BLACK)
+        DISPLAYSURF.blit(moves_surf, (10, 5))
+        pygame.display.update()
 
         checkForQuit()
         for event in pygame.event.get(): # event handling loop
@@ -116,6 +123,7 @@ def main():
             lastPaletteClicked = paletteClicked
             floodAnimation(mainBoard, paletteClicked)
             life -= 1
+            moves += 1
 
             resetGame = False
             if hasWon(mainBoard):

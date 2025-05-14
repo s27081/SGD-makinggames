@@ -63,7 +63,6 @@ def main():
         msg = 'Click tile or press arrow keys to slide.' # contains the message to show in the upper left corner.
         if mainBoard == SOLVEDBOARD:
             msg = 'Solved!'
-
         drawBoard(mainBoard, msg)
 
         checkForQuit()
@@ -107,9 +106,12 @@ def main():
                     slideTo = DOWN
 
         if slideTo:
-            slideAnimation(mainBoard, slideTo, 'Click tile or press arrow keys to slide.', 8) # show slide on screen
+            slideAnimation(mainBoard, slideTo, 'Click tile or press arrow keys to slide.', 8, moves=len(allMoves)) # show slide on screen
             makeMove(mainBoard, slideTo)
             allMoves.append(slideTo) # record the slide
+        moves = len(allMoves)
+        moves_surf = BASICFONT.render("Moves: " + str(moves), True, WHITE)
+        DISPLAYSURF.blit(moves_surf, (5, 40))
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -251,7 +253,7 @@ def drawBoard(board, message):
     DISPLAYSURF.blit(SOLVE_SURF, SOLVE_RECT)
 
 
-def slideAnimation(board, direction, message, animationSpeed):
+def slideAnimation(board, direction, message, animationSpeed, moves=0):
     # Note: This function does not check if the move is valid.
 
     blankx, blanky = getBlankPosition(board)
@@ -279,6 +281,10 @@ def slideAnimation(board, direction, message, animationSpeed):
         # animate the tile sliding over
         checkForQuit()
         DISPLAYSURF.blit(baseSurf, (0, 0))
+
+        moves_surf = BASICFONT.render("Moves: " + str(moves), True, WHITE)
+        DISPLAYSURF.blit(moves_surf, (5, 40))
+
         if direction == UP:
             drawTile(movex, movey, board[movex][movey], 0, -i)
         if direction == DOWN:

@@ -38,6 +38,7 @@ def main():
     global FPSCLOCK, DISPLAYSURF, REDPILERECT, BLACKPILERECT, REDTOKENIMG
     global BLACKTOKENIMG, BOARDIMG, ARROWIMG, ARROWRECT, HUMANWINNERIMG
     global COMPUTERWINNERIMG, WINNERRECT, TIEWINNERIMG
+    global BASICFONT
 
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
@@ -63,6 +64,8 @@ def main():
     ARROWRECT = ARROWIMG.get_rect()
     ARROWRECT.left = REDPILERECT.right + 10
     ARROWRECT.centery = REDPILERECT.centery
+
+    BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
 
     isFirstGame = True
 
@@ -91,7 +94,9 @@ def runGame(isFirstGame):
     while True: # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            getHumanMove(mainBoard, showHelp)
+            drawBoard(mainBoard, player="HUMAN")
+            pygame.display.update()
+            getHumanMove(mainBoard, showHelp, "HUMAN")
             if showHelp:
                 # turn off help arrow after the first move
                 showHelp = False
@@ -101,6 +106,8 @@ def runGame(isFirstGame):
             turn = COMPUTER # switch to other player's turn
         else:
             # Computer player's turn.
+            drawBoard(mainBoard, player="COMPUTER")
+            pygame.display.update()
             column = getComputerMove(mainBoard)
             animateComputerMoving(mainBoard, column)
             makeMove(mainBoard, BLACK, column)
@@ -127,14 +134,13 @@ def runGame(isFirstGame):
             elif event.type == MOUSEBUTTONUP:
                 return
 
-
 def makeMove(board, player, column):
     lowest = getLowestEmptySpace(board, column)
     if lowest != -1:
         board[column][lowest] = player
 
 
-def drawBoard(board, extraToken=None):
+def drawBoard(board, extraToken=None, player=None):
     DISPLAYSURF.fill(BGCOLOR)
 
     # draw tokens
@@ -164,6 +170,12 @@ def drawBoard(board, extraToken=None):
     DISPLAYSURF.blit(REDTOKENIMG, REDPILERECT) # red on the left
     DISPLAYSURF.blit(BLACKTOKENIMG, BLACKPILERECT) # black on the right
 
+    if player is not None:
+        game_over = BASICFONT.render('Player: ' + str(player) , 1, WHITE)
+        game_over_rect = game_over.get_rect()
+        game_over_rect.center = (WINDOWWIDTH / 2, YMARGIN - 50)
+        DISPLAYSURF.blit(game_over, game_over_rect)
+
 
 def getNewBoard():
     board = []
@@ -172,7 +184,7 @@ def getNewBoard():
     return board
 
 
-def getHumanMove(board, isFirstMove):
+def getHumanMove(board, isFirstMove, player):
     draggingToken = False
     tokenx, tokeny = None, None
     while True:
@@ -201,9 +213,9 @@ def getHumanMove(board, isFirstMove):
                 tokenx, tokeny = None, None
                 draggingToken = False
         if tokenx != None and tokeny != None:
-            drawBoard(board, {'x':tokenx - int(SPACESIZE / 2), 'y':tokeny - int(SPACESIZE / 2), 'color':RED})
+            drawBoard(board, {'x':tokenx - int(SPACESIZE / 2), 'y':tokeny - int(SPACESIZE / 2), 'color':RED}, player=player)
         else:
-            drawBoard(board)
+            drawBoard(board,player=player)
 
         if isFirstMove:
             # Show the help arrow for the player's first move.
@@ -238,7 +250,7 @@ def animateComputerMoving(board, column):
     while y > (YMARGIN - SPACESIZE):
         y -= int(speed)
         speed += 0.5
-        drawBoard(board, {'x':x, 'y':y, 'color':BLACK})
+        drawBoard(board, {'x':x, 'y':y, 'color':BLACK}, player="COMPUTER")
         pygame.display.update()
         FPSCLOCK.tick()
     # moving the black tile over
@@ -247,7 +259,7 @@ def animateComputerMoving(board, column):
     while x > (XMARGIN + column * SPACESIZE):
         x -= int(speed)
         speed += 0.5
-        drawBoard(board, {'x':x, 'y':y, 'color':BLACK})
+        drawBoard(board, {'x':x, 'y':y, 'color':BLACK}, player="COMPUTER")
         pygame.display.update()
         FPSCLOCK.tick()
     # dropping the black tile

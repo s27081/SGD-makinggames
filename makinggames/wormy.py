@@ -73,6 +73,8 @@ def runGame():
                     direction = DOWN
                 elif event.key == K_ESCAPE:
                     terminate()
+                elif event.key == K_p:
+                    pauseGame()
 
         # check if the worm has hit itself or the edge
         if wormCoords[HEAD]['x'] == -1 or wormCoords[HEAD]['x'] == CELLWIDTH or wormCoords[HEAD]['y'] == -1 or wormCoords[HEAD]['y'] == CELLHEIGHT:
@@ -105,6 +107,23 @@ def runGame():
         drawScore(len(wormCoords) - 3)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+def pauseGame():
+    paused_font = pygame.font.Font('freesansbold.ttf', 60)
+    pause_surf = paused_font.render('Paused', True, WHITE)
+    pause_rect = pause_surf.get_rect()
+    pause_rect.center = (WINDOWWIDTH // 2, WINDOWHEIGHT // 2)
+
+    DISPLAYSURF.blit(pause_surf, pause_rect)
+    drawPressKeyMsg()
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                terminate()
+            elif event.type == KEYDOWN:
+                return
 
 def drawPressKeyMsg():
     pressKeySurf = BASICFONT.render('Press a key to play.', True, DARKGRAY)
